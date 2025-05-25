@@ -15,7 +15,6 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.MockServerRestTemplateCustomizer;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +31,7 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
@@ -79,7 +79,7 @@ public class BeerClientMockTest {
     BeerDTO dto;
     String dtoJson;
 
-    @MockBean
+    @MockitoBean
     OAuth2AuthorizedClientManager manager;
 
     @TestConfiguration
@@ -135,9 +135,7 @@ public class BeerClientMockTest {
     void testListBeersWithQueryParam() throws JsonProcessingException {
         String response = objectMapper.writeValueAsString(getPage());
 
-        URI uri = UriComponentsBuilder.fromHttpUrl(URL + BeerClientImpl.GET_BEER_PATH)
-                .queryParam("beerName", "ALE")
-                .build().toUri();
+        URI uri = URI.create(URL + BeerClientImpl.GET_BEER_PATH + "?beerName=ALE");
 
         server.expect(method(HttpMethod.GET))
                 .andExpect(requestTo(uri))
@@ -159,9 +157,7 @@ public class BeerClientMockTest {
                 .andExpect(header("Authorization", BEARER_TEST))
                 .andRespond(withResourceNotFound());
 
-        assertThrows(HttpClientErrorException.class, () -> {
-            beerClient.deleteBeer(dto.getId());
-        });
+        assertThrows(HttpClientErrorException.class, () -> beerClient.deleteBeer(dto.getId()));
 
         server.verify();
     }
