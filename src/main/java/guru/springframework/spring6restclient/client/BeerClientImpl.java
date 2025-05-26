@@ -30,6 +30,7 @@ public class BeerClientImpl implements BeerClient {
         return listBeers(null, null, null, null, null);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Page<BeerDTO> listBeers(String beerName, BeerStyle beerStyle, Boolean showInventory, Integer pageNumber, Integer pageSize) {
         RestClient restClient = restClientBuilder.build();
